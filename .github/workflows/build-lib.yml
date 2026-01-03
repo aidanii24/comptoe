@@ -17,16 +17,22 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Install Compiler
+      - name: Install Compiler (Windows)
+        id: install_comp_win
+        if: matrix.os == 'windows-latest'
         uses: rlalik/setup-cpp-compiler@master
         with:
-          compiler: gcc-latest
+          compiler: latest
+
+      - name: Install Compiler (Linux)
+        if: matrix.os == 'ubuntu-latest'
+        run: sudo apt-get install -y build-essential
 
       - name: Build Library (Windows)
         if: matrix.os == 'windows-latest'
         shell: bash
         env:
-          CC: ${{ steps.install_cc.outputs.cc }}
+          CC: ${{ steps.install_comp_win.outputs.cc }}
         run: |
           $CC -c -o complib.o complib.c
           $CC -o ${{ env.PKG_NAME }} complib.o -s -shared  -Wl, --subsystem,windows
@@ -36,7 +42,7 @@ jobs:
         shell: bash
         env:
           CC: ${{ steps.install_cc.outputs.cc }}
-        run: $CC -fPIC -shared -o ${{ env.PKG_NAME }}.so complib.c
+        run: gcc -fPIC -shared -o ${{ env.PKG_NAME }}.so complib.c
 
       - name: Create Artifact (Windows)
         if: matrix.os == 'windows-latest'
