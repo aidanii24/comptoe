@@ -17,37 +17,40 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Install Compiler (Linux)
-        if: matrix.os == 'ubuntu-latest'
-        run: sudo apt-get install -y GCC
-
-      - name: Install Compiler (Windows)
+      - name: Install Compiler
         uses: rlalik/setup-cpp-compiler@master
         with:
           compiler: gcc-latest
 
-      - name: Build Library (Linux)
-        run: gcc -fPIC -shared -o ${{ env.PKG_NAME }}.so complib.c
-
       - name: Build Library (Windows)
+        if: matrix.os == 'windows-latest'
         shell: bash
         env:
           CC: ${{ steps.install_cc.outputs.cc }}
-        run: $CC -fPIC -shared -o ${{ env.PKG_NAME }}.dll complib.c
+        run: |
+          $CC -c -o complib.o complib.c
+          $CC -o ${{ env.PKG_NAME }} complib.o -s -shared  -Wl, --subsystem,windows
+
+      - name: Build Library (Linux)
+        if: matrix.os == 'ubuntu-latest'
+        shell: bash
+        env:
+          CC: ${{ steps.install_cc.outputs.cc }}
+        run: $CC -fPIC -shared -o ${{ env.PKG_NAME }}.so complib.c
 
       - name: Create Artifact (Windows)
         if: matrix.os == 'windows-latest'
         uses: actions/upload-artifact@v4
         with:
           name: complib-windows
-          path: /
+          path: ${{ env.PKG_NAME }}.dll
 
       - name: Create Artifact (Linux)
         if: matrix.os == 'ubuntu-latest'
         uses: actions/upload-artifact@v4
         with:
           name: complib-linux
-          path: /
+          path: ${{ env.PKG_NAME }}.so
 
       - name: List bundle output
         run: ls -R ./dist/
