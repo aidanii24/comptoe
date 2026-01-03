@@ -1,0 +1,53 @@
+name: Build
+
+on: workflow_dispatch
+
+env:
+  PKG_NAME: "_complib"
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: ["windows-latest", "ubuntu-latest"]
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Install Compiler (Linux)
+        if: os.matrix == 'ubuntu-latest'
+        run: sudo apt-get install -y GCC
+
+      - name: Install Compiler (Windows)
+        uses: rlalik/setup-cpp-compiler@master
+        with:
+          compiler: gcc-latest
+
+      - name: Build Library (Linux)
+        run: gcc -fPIC -shared -o ${{ PKG_NAME }}.so complib.c
+
+      - name: Build Library (Windows)
+        shell: bash
+        env:
+          CC: ${{ steps.install_cc.outputs.cc }}
+        run: $CC -fPIC -shared -o ${{ PKG_NAME }}.dll complib.c
+
+      - name: Create Artifact (Windows)
+        if: matrix.os == 'windows-latest'
+        uses: actions/upload-artifact@v4
+        with:
+          name: complib-windows
+          path: /
+
+      - name: Create Artifact (Linux)
+        if: matrix.os == 'ubuntu-latest'
+        uses: actions/upload-artifact@v4
+        with:
+          name: complib-linux
+          path: /
+
+      - name: List bundle output
+        run: ls -R ./dist/
