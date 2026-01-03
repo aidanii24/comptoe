@@ -59,4 +59,4 @@ jobs:
           path: ${{ env.PKG_NAME }}.so
 
       - name: List bundle output
-        run: ls -R ./dist/
+        run: ls | grep ${{ env.PKG_NAME }}
