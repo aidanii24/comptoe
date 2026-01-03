@@ -36,7 +36,6 @@ jobs:
         run: |
           $CC -c -o complib.o complib.c
           $CC -o ${{ env.PKG_NAME }}.dll complib.o -s -shared  -Wl,--subsystem,windows
-          ls
 
       - name: Build Library (Linux)
         if: matrix.os == 'ubuntu-latest'
