@@ -34,7 +34,7 @@ jobs:
         env:
           CC: ${{ steps.install_comp_win.outputs.cc }}
         run: |
-          Get-Location
+          echo %cd%
           $CC -c -o complib.o complib.c
           $CC -o ${{ env.PKG_NAME }} complib.o -s -shared  -Wl,--subsystem,windows
           ls
