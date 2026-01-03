@@ -27,13 +27,13 @@ jobs:
           compiler: gcc-latest
 
       - name: Build Library (Linux)
-        run: gcc -fPIC -shared -o ${{ PKG_NAME }}.so complib.c
+        run: gcc -fPIC -shared -o ${{ env.PKG_NAME }}.so complib.c
 
       - name: Build Library (Windows)
         shell: bash
         env:
           CC: ${{ steps.install_cc.outputs.cc }}
-        run: $CC -fPIC -shared -o ${{ PKG_NAME }}.dll complib.c
+        run: $CC -fPIC -shared -o ${{ env.PKG_NAME }}.dll complib.c
 
       - name: Create Artifact (Windows)
         if: matrix.os == 'windows-latest'
