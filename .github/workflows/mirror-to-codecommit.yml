@@ -1,10 +1,9 @@
 name: Mirror GitHub To CodeCommit
 
-on: [push]
+on: workflow_dispatch
 
 jobs:
   mirror_to_codecommit:
-
     runs-on: ubuntu-latest
 
     steps:
