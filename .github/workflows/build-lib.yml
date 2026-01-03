@@ -35,7 +35,7 @@ jobs:
           CC: ${{ steps.install_comp_win.outputs.cc }}
         run: |
           $CC -c -o complib.o complib.c
-          $CC -o ${{ env.PKG_NAME }} complib.o -s -shared  -Wl, --subsystem,windows
+          $CC -o ${{ env.PKG_NAME }} complib.o -s -shared  -Wl,--subsystem,windows
 
       - name: Build Library (Linux)
         if: matrix.os == 'ubuntu-latest'
